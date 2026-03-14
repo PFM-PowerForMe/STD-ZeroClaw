@@ -1,0 +1,5 @@
+#!/command/execlineb -P
+with-contenv
+s6-notifyoncheck -d
+s6-setuidgid zeroclaw
+zeroclaw daemon

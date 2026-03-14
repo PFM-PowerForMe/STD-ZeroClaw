@@ -1,0 +1,10 @@
+#!/command/with-contenv sh
+set -e
+
+SOCKET_FILE=$1
+
+if [ -S "$SOCKET_FILE" ]; then
+    exit 0
+else
+    exit 1
+fi

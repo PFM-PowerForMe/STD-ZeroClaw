@@ -1,0 +1,18 @@
+#!/command/with-contenv sh
+set -e
+
+PORT=$1
+
+if [[ ! "$PORT" =~ ^[0-9]+$ ]] || [ "$PORT" -gt 65535 ] || [ "$PORT" -lt 1 ]; then
+    exit 1
+fi
+
+HEX_PORT=$(printf '%04X' "$PORT")
+
+if [ -e /proc/net/tcp ] && grep -q ":$HEX_PORT " /proc/net/tcp; then
+    exit 0
+elif [ -e /proc/net/tcp6 ] && grep -q ":$HEX_PORT " /proc/net/tcp6; then
+    exit 0
+else
+    exit 1
+fi

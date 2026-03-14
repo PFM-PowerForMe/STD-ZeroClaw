@@ -1,0 +1,5 @@
+#!/command/execlineb -P
+with-contenv
+s6-notifyoncheck -d
+s6-setuidgid zeroclaw
+chromedriver --port=9515 --allowed-ips=127.0.0.1

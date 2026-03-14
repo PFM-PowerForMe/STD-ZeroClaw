@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+set -euo pipefail
+
+# tools
+[ -d "/pfm/bin" ] && find /pfm/bin -type f -exec chmod 0755 {} + 2>/dev/null || true;
+
+# s6
+[ -d "/etc/s6-overlay/s6-rc.d" ] && find /etc/s6-overlay/s6-rc.d -type f -exec chmod 0755 {} + 2>/dev/null || true;
+[ -d "/etc/s6-overlay/scripts" ] && find /etc/s6-overlay/scripts -type f -exec chmod 0755 {} + 2>/dev/null || true;
+[ -d "/etc/s6-overlay/init-data" ] && find /etc/s6-overlay/init-data -type f -exec chmod 0755 {} + 2>/dev/null || true;
