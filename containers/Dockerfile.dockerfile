@@ -72,9 +72,6 @@ RUN mkdir -p /zeroclaw-data/.zeroclaw /zeroclaw-data/workspace && \
 # ── Stage 2: Runtime ──────────────────
 FROM debian:trixie-slim AS runtime
 
-COPY --from=s6 / /
-COPY rootfs/ /
-
 RUN echo 'APT::Sandbox::User "root";' > /etc/apt/apt.conf.d/99sandbox
 
 # Create user and install multi-language toolchains & CLI tools
@@ -118,6 +115,9 @@ ENV PATH="/command:/pfm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/s
     GOMODCACHE="/zeroclaw-data/.cache/go-mod" \
     CARGO_HOME="/zeroclaw-data/.cargo"
 
+COPY --from=s6 / /
+COPY rootfs/ /
+
 # Initialize cache directories with correct permissions
 RUN mkdir -p \
         ${PIP_CACHE_DIR} \
@@ -135,4 +135,4 @@ WORKDIR /zeroclaw-data
 VOLUME /zeroclaw-data
 EXPOSE 8080
 
-ENTRYPOINT ["init"]
+ENTRYPOINT ["/init"]
