@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+
+mkdir -pv \
+        ${XDG_CONFIG_HOME} \
+        ${XDG_CACHE_HOME} \
+        ${XDG_DATA_HOME} \
+        ${XDG_STATE_HOME} \
+        ${PIP_CACHE_DIR} \
+        ${npm_config_cache} \
+        ${GOCACHE} \
+        ${GOMODCACHE} \
+        ${GOPATH} \
+        ${CARGO_HOME} \
+        ${ZEROCLAW_WORKSPACE}
+
+chown zeroclaw:zeroclaw -R /zeroclaw-data

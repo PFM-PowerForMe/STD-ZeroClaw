@@ -107,6 +107,10 @@ ENV PATH="/command:/pfm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/s
     COLORTERM="truecolor" \
     ZEROCLAW_WORKSPACE="/zeroclaw-data/workspace" \
     HOME="/zeroclaw-data" \
+    XDG_CONFIG_HOME="/zeroclaw-data/.config" \
+    XDG_CACHE_HOME="/zeroclaw-data/.cache" \
+    XDG_DATA_HOME="/zeroclaw-data/.local/share" \
+    XDG_STATE_HOME="/zeroclaw-data/.local/state" \
     ZEROCLAW_GATEWAY_PORT="8080" \
     PIP_CACHE_DIR="/zeroclaw-data/.cache/pip" \
     npm_config_cache="/zeroclaw-data/.cache/npm" \
@@ -119,7 +123,11 @@ COPY --from=s6 / /
 COPY rootfs/ /
 
 # Initialize cache directories with correct permissions
-RUN mkdir -p \
+RUN mkdir -pv \
+        ${XDG_CONFIG_HOME} \
+        ${XDG_CACHE_HOME} \
+        ${XDG_DATA_HOME} \
+        ${XDG_STATE_HOME} \
         ${PIP_CACHE_DIR} \
         ${npm_config_cache} \
         ${GOCACHE} \

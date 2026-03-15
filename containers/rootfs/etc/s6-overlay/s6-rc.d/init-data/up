@@ -1,0 +1,3 @@
+#!/command/execlineb -P
+with-contenv
+run-parts /etc/s6-overlay/init-data/

@@ -1,5 +1,4 @@
-#!/command/with-contenv sh
-set -e
+#!/command/with-contenv bash
 
 PID_FILE=$1
 
