@@ -10,6 +10,7 @@ RUN npm run build
 
 # ── Stage 1: Build Backend ────────────
 FROM rust:1.93-slim@sha256:9663b80a1621253d30b146454f903de48f0af925c967be48c84745537cd35d8b AS builder
+ARG IMAGE_VERSION
 ARG REPO
 ARG ARCH
 ARG CPU_ARCH
