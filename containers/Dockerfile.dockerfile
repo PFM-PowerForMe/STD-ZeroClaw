@@ -80,7 +80,7 @@ RUN groupadd -g 2000 zeroclaw && \
     useradd -u 2000 -g 2000 -d /zeroclaw-data -m -s /bin/bash zeroclaw
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        ca-certificates bash curl wget git gh openssh-client gnupg less neovim tmux neovim \
+        ca-certificates bash curl wget git gh openssh-client gnupg less neovim \
         jq ripgrep fd-find tree unzip tar strace lsof \
         build-essential make \
         python3 python3-pip python3-venv \
@@ -89,10 +89,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         cargo rustc \
         shellcheck \
         chromium chromium-driver \
+        htop tmux fzf zoxide bat eza du-dust dnsutils netcat-openbsd socat \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g @ast-grep/cli && \
-    pip3 install ruff --break-system-packages
+    pip3 install ruff --break-system-packages && \
+    echo 'eval "$(zoxide init bash)"' >> /zeroclaw-data/.bashrc && \
+    echo 'alias ls="eza"' >> /zeroclaw-data/.bashrc && \
+    echo 'alias ll="eza -l"' >> /zeroclaw-data/.bashrc && \
+    echo 'alias cat="batcat --paging=never"' >> /zeroclaw-data/.bashrc && \
+    echo 'alias top="htop"' >> /zeroclaw-data/.bashrc && \
+    echo 'alias du="dust"' >> /zeroclaw-data/.bashrc
 
 # Copy artifacts
 COPY --from=builder /app/zeroclaw /usr/local/bin/zeroclaw
