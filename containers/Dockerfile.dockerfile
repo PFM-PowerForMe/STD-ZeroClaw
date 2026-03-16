@@ -29,8 +29,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Cache Cargo dependencies
 COPY source-src/Cargo.toml source-src/Cargo.lock ./
 COPY source-src/crates/robot-kit/Cargo.toml crates/robot-kit/Cargo.toml
+
 RUN mkdir -p src benches crates/robot-kit/src \
     && echo "fn main() {}" > src/main.rs \
+    && echo "" > src/lib.rs \
     && echo "fn main() {}" > benches/agent_benchmarks.rs \
     && echo "pub fn placeholder() {}" > crates/robot-kit/src/lib.rs
 RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
