@@ -1,0 +1,60 @@
+name: 'PFM-Upstream-Sync'
+
+env:
+  UPSTREAM_REPO: 'https://github.com/zeroclaw-labs/zeroclaw.git'
+  UPSTREAM_BRANCH: master
+  TARGET_BRANCH: master
+  MATCH_TAG: '*'
+  EXCLUDE_TAG: '*beta*,*alpha*,*rc*,*nightly*'
+
+on:
+  schedule:
+    - cron: "0 13 * * *" # 每天13点
+  workflow_dispatch:
+
+concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  Sync_Latest_From_UpStream:
+    name: '同步上游仓库最新提交'
+    runs-on: ubuntu-slim
+    outputs:
+      has_new_commits: ${{ steps.sync.outputs.has_new_commits }}
+      has_match_tags: ${{ steps.sync.outputs.has_match_tags }}
+      tag: ${{ steps.sync.outputs.tag }}
+
+    steps:
+      - name: '同步变化'
+        id: sync
+        uses: PFM-PowerForMe/PFM-Action-SYNC@main
+        with:
+          upstream_repo_url: ${{ env.UPSTREAM_REPO }}
+          upstream_sync_branch: ${{ env.UPSTREAM_BRANCH }}
+          target_sync_branch: ${{ env.TARGET_BRANCH }}
+          target_repo_token: ${{ secrets.SYNC_TOKEN }}
+          match_tag: ${{ env.MATCH_TAG }}
+          exclude_tag: ${{ env.EXCLUDE_TAG }}
+          update_variable_token: ${{ secrets.PFM_ACTION_VAR_TOKEN }}
+
+      - name: '同步失败'
+        if: failure()
+        run: |
+          echo "[Error] 由于上游仓库工作流文件的更改，GitHub 已自动暂停了计划的自动更新。您需要手动同步您的复刻。"
+          exit 1
+
+  Repo-Dispatch:
+    needs: Sync_Latest_From_UpStream
+    if: needs.Sync_Latest_From_UpStream.outputs.has_match_tags == 'true'
+    runs-on: ubuntu-slim
+    steps:
+      - name: "Repository Dispatch"
+        uses: PFM-PowerForMe/PFM-Action-RepoDispatch@main
+        with:
+          token: ${{ secrets.SYNC_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: pfm-build-event
