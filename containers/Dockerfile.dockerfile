@@ -1,7 +1,7 @@
 FROM ghcr.io/pfm-powerforme/s6:latest AS s6
 
 # ── Stage 0: Build Frontend ───────────
-FROM node:22-slim AS frontend-builder
+FROM node:lts-trixie-slim AS frontend-builder
 WORKDIR /frontend
 COPY source-src/web/package*.json ./
 RUN npm install
@@ -9,7 +9,7 @@ COPY source-src/web/ ./
 RUN npm run build
 
 # ── Stage 1: Build Backend ────────────
-FROM rust:1.93-slim@sha256:9663b80a1621253d30b146454f903de48f0af925c967be48c84745537cd35d8b AS builder
+FROM rust:slim-trixie AS builder
 ARG IMAGE_VERSION
 ARG REPO
 ARG ARCH
@@ -49,6 +49,8 @@ COPY source-src/firmware/ firmware/
 COPY source-src/web/ web/
 COPY --from=frontend-builder /frontend/dist/ web/dist/
 
+RUN find . -name "*.rs" -exec touch {} +
+
 RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,id=zeroclaw-cargo-git,target=/usr/local/cargo/git,sharing=locked \
     --mount=type=cache,id=zeroclaw-target,target=/app/target,sharing=locked \
@@ -82,7 +84,7 @@ RUN groupadd -g 2000 zeroclaw && \
     useradd -u 2000 -g 2000 -d /zeroclaw-data -m -s /bin/bash zeroclaw
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        ca-certificates bash curl wget git gh openssh-client gnupg less neovim tmux neovim \
+        ca-certificates bash curl wget git gh openssh-client gnupg less tmux neovim \
         jq ripgrep fd-find tree unzip tar strace lsof \
         build-essential make \
         python3 python3-pip python3-venv \
