@@ -24,6 +24,3 @@ jobs:
       contents: read
       packages: write
     uses: PFM-PowerForMe/PFM-Action-Public/.github/workflows/custom-container-build.yml@main
-    with:
-      build_pull_ref: master
-      build_use_tag: false
