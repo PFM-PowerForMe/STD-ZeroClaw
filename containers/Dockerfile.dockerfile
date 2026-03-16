@@ -39,7 +39,7 @@ RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/regist
     --mount=type=cache,id=zeroclaw-cargo-git,target=/usr/local/cargo/git,sharing=locked \
     --mount=type=cache,id=zeroclaw-target,target=/app/target,sharing=locked \
     cargo build --all-features --release --locked
-RUN rm -rf src benches crates/robot-kit/src
+RUN rm -rf src benches crates
 
 # Build actual binary
 COPY source-src/src/ src/
@@ -97,7 +97,7 @@ RUN npm install -g @ast-grep/cli && \
     pip3 install ruff --break-system-packages
 
 # Copy artifacts
-COPY --from=builder /app/zeroclaw /usr/local/bin/zeroclaw
+COPY --from=builder /app/zeroclaw /usr/local/sbin/zeroclaw
 COPY --from=builder --chown=2000:2000 /zeroclaw-data /zeroclaw-data
 
 # Set environments & redirect package manager caches
