@@ -9,7 +9,7 @@ COPY source-src/web/ ./
 RUN npm run build
 
 # ── Stage 1: Build Backend ────────────
-FROM rust:1.93-slim@sha256:9663b80a1621253d30b146454f903de48f0af925c967be48c84745537cd35d8b AS builder
+FROM rust:1.94-slim@sha256:da9dab7a6b8dd428e71718402e97207bb3e54167d37b5708616050b1e8f60ed6 AS builder
 # FROM rust:slim-trixie AS builder
 ARG IMAGE_VERSION
 ARG REPO
@@ -48,16 +48,23 @@ COPY source-src/benches/ benches/
 COPY source-src/crates/ crates/
 COPY source-src/firmware/ firmware/
 COPY source-src/web/ web/
+COPY source-src/*.rs .
 COPY --from=frontend-builder /frontend/dist/ web/dist/
 
-RUN find . -name "*.rs" -exec touch {} +
+# RUN find . -name "*.rs" -exec touch {} +
+RUN touch src/main.rs
 
 RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,id=zeroclaw-cargo-git,target=/usr/local/cargo/git,sharing=locked \
     --mount=type=cache,id=zeroclaw-target,target=/app/target,sharing=locked \
+    rm -rf target/release/.fingerprint/zeroclawlabs-* \
+           target/release/deps/zeroclawlabs-* \
+           target/release/incremental/zeroclawlabs-* && \
     cargo build --release --all-features --locked && \
     cp target/release/zeroclaw /app/zeroclaw && \
     strip /app/zeroclaw
+RUN size=$(stat -c%s /app/zeroclaw 2>/dev/null || stat -f%z /app/zeroclaw) && \
+    if [ "$size" -lt 1000000 ]; then echo "ERROR: binary too small (${size} bytes), likely dummy build artifact" && exit 1; fi
 
 # Generate default configuration
 RUN mkdir -p /zeroclaw-data/.zeroclaw /zeroclaw-data/workspace && \
@@ -102,6 +109,7 @@ RUN npm install -g @ast-grep/cli && \
 # Copy artifacts
 COPY --from=builder /app/zeroclaw /usr/local/sbin/zeroclaw
 COPY --from=builder --chown=2000:2000 /zeroclaw-data /zeroclaw-data
+COPY source-src/dev/config.template.toml /zeroclaw-data/.zeroclaw/config.toml
 
 # Set environments & redirect package manager caches
 ENV PATH="/command:/pfm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
