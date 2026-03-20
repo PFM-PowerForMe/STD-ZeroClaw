@@ -38,7 +38,7 @@ RUN mkdir -p src benches \
 RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,id=zeroclaw-cargo-git,target=/usr/local/cargo/git,sharing=locked \
     --mount=type=cache,id=zeroclaw-target,target=/app/target,sharing=locked \
-    cargo build --release --features "hardware channel-lark memory-postgres observability-otel peripheral-rpi browser-native fantoccini sandbox-landlock sandbox-bubblewrap landlock metrics probe rag-pdf plugins-wasm"
+    cargo build --release --features "channel-lark memory-postgres observability-otel peripheral-rpi browser-native fantoccini sandbox-landlock sandbox-bubblewrap landlock metrics probe rag-pdf plugins-wasm"
 RUN rm -rf src benches
 
 # Build actual binary
@@ -57,7 +57,7 @@ RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/regist
     rm -rf target/release/.fingerprint/zeroclawlabs-* \
            target/release/deps/zeroclawlabs-* \
            target/release/incremental/zeroclawlabs-* && \
-    cargo build --release --features "hardware channel-lark memory-postgres observability-otel peripheral-rpi browser-native fantoccini sandbox-landlock sandbox-bubblewrap landlock metrics probe rag-pdf plugins-wasm" && \
+    cargo build --release --features "channel-lark memory-postgres observability-otel peripheral-rpi browser-native fantoccini sandbox-landlock sandbox-bubblewrap landlock metrics probe rag-pdf plugins-wasm" && \
     cp target/release/zeroclaw /app/zeroclaw && \
     strip /app/zeroclaw
 RUN size=$(stat -c%s /app/zeroclaw 2>/dev/null || stat -f%z /app/zeroclaw) && \
