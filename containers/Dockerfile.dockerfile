@@ -9,8 +9,8 @@ COPY source-src/web/ ./
 RUN npm run build
 
 # ── Stage 1: Build Backend ────────────
-FROM rust:1.94-slim@sha256:da9dab7a6b8dd428e71718402e97207bb3e54167d37b5708616050b1e8f60ed6 AS builder
-# FROM rust:slim-trixie AS builder
+# FROM rust:1.94-slim@sha256:da9dab7a6b8dd428e71718402e97207bb3e54167d37b5708616050b1e8f60ed6 AS builder
+FROM rust:slim-trixie AS builder
 ARG IMAGE_VERSION
 ARG REPO
 ARG ARCH
@@ -38,7 +38,7 @@ RUN mkdir -p src benches \
 RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,id=zeroclaw-cargo-git,target=/usr/local/cargo/git,sharing=locked \
     --mount=type=cache,id=zeroclaw-target,target=/app/target,sharing=locked \
-    cargo build --all-features --release
+    cargo build --release --features "hardware channel-lark channel-feishu memory-postgres observability-otel peripheral-rpi browser-native fantoccini sandbox-landlock sandbox-bubblewrap landlock metrics probe rag-pdf whatsapp-web plugins-wasm"
 RUN rm -rf src benches
 
 # Build actual binary
@@ -57,7 +57,7 @@ RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/regist
     rm -rf target/release/.fingerprint/zeroclawlabs-* \
            target/release/deps/zeroclawlabs-* \
            target/release/incremental/zeroclawlabs-* && \
-    cargo build --release --all-features && \
+    cargo build --release --features "hardware channel-lark channel-feishu memory-postgres observability-otel peripheral-rpi browser-native fantoccini sandbox-landlock sandbox-bubblewrap landlock metrics probe rag-pdf whatsapp-web plugins-wasm" && \
     cp target/release/zeroclaw /app/zeroclaw && \
     strip /app/zeroclaw
 RUN size=$(stat -c%s /app/zeroclaw 2>/dev/null || stat -f%z /app/zeroclaw) && \
