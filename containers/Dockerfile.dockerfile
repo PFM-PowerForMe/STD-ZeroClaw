@@ -19,7 +19,7 @@ ENV REPO=$REPO \
     ARCH=$ARCH \
     CPU_ARCH=$CPU_ARCH \
     IMAGE_VERSION=$IMAGE_VERSION \
-    FEATURES="channel-lark memory-postgres browser-native fantoccini metrics probe rag-pdf plugins-wasm"
+    FEATURES="observability-prometheus channel-lark memory-postgres browser-native fantoccini metrics probe rag-pdf plugins-wasm"
 
 WORKDIR /app
 
@@ -39,7 +39,7 @@ RUN mkdir -p src benches \
 RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,id=zeroclaw-cargo-git,target=/usr/local/cargo/git,sharing=locked \
     --mount=type=cache,id=zeroclaw-target,target=/app/target,sharing=locked \
-    cargo build --release --features $FEATURES
+    cargo build --release --features "$FEATURES"
 RUN rm -rf src benches
 
 # Build actual binary
@@ -58,7 +58,7 @@ RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/regist
     rm -rf target/release/.fingerprint/zeroclawlabs-* \
            target/release/deps/zeroclawlabs-* \
            target/release/incremental/zeroclawlabs-* && \
-    cargo build --release --features $FEATURES && \
+    cargo build --release --features "$FEATURES" && \
     cp target/release/zeroclaw /app/zeroclaw && \
     strip /app/zeroclaw
 RUN size=$(stat -c%s /app/zeroclaw 2>/dev/null || stat -f%z /app/zeroclaw) && \
