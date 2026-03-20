@@ -4,7 +4,7 @@ FROM ghcr.io/pfm-powerforme/s6:latest AS s6
 FROM node:lts-trixie-slim AS frontend-builder
 WORKDIR /frontend
 COPY source-src/web/package*.json ./
-RUN npm install
+RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts
 COPY source-src/web/ ./
 RUN npm run build
 
@@ -29,24 +29,21 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 # Cache Cargo dependencies
 COPY source-src/Cargo.toml source-src/Cargo.lock ./
-COPY source-src/crates/robot-kit/Cargo.toml crates/robot-kit/Cargo.toml
+RUN sed -i 's/members = \[".", "crates\/robot-kit"\]/members = ["."]/' Cargo.toml
 
-RUN mkdir -p src benches crates/robot-kit/src \
+RUN mkdir -p src benches \
     && echo "fn main() {}" > src/main.rs \
     && echo "" > src/lib.rs \
-    && echo "fn main() {}" > benches/agent_benchmarks.rs \
-    && echo "pub fn placeholder() {}" > crates/robot-kit/src/lib.rs
+    && echo "fn main() {}" > benches/agent_benchmarks.rs
 RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,id=zeroclaw-cargo-git,target=/usr/local/cargo/git,sharing=locked \
     --mount=type=cache,id=zeroclaw-target,target=/app/target,sharing=locked \
     cargo build --all-features --release --locked
-RUN rm -rf src benches crates
+RUN rm -rf src benches
 
 # Build actual binary
 COPY source-src/src/ src/
 COPY source-src/benches/ benches/
-COPY source-src/crates/ crates/
-COPY source-src/firmware/ firmware/
 COPY source-src/web/ web/
 COPY source-src/*.rs .
 COPY --from=frontend-builder /frontend/dist/ web/dist/
