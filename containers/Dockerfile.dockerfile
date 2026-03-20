@@ -128,7 +128,8 @@ ENV PATH="/command:/pfm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/s
     GOPATH="/zeroclaw-data/.go" \
     GOCACHE="/zeroclaw-data/.cache/go-build" \
     GOMODCACHE="/zeroclaw-data/.cache/go-mod" \
-    CARGO_HOME="/zeroclaw-data/.cargo"
+    CARGO_HOME="/zeroclaw-data/.cargo" \
+    SHELL="/usr/bin/bash"
 
 COPY --from=s6 / /
 COPY rootfs/ /
