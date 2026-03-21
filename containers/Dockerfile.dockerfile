@@ -19,7 +19,9 @@ ENV REPO=$REPO \
     ARCH=$ARCH \
     CPU_ARCH=$CPU_ARCH \
     IMAGE_VERSION=$IMAGE_VERSION \
-    FEATURES="observability-prometheus channel-lark memory-postgres browser-native fantoccini metrics probe rag-pdf plugins-wasm"
+    FEATURES="observability-prometheus channel-lark memory-postgres browser-native fantoccini metrics probe rag-pdf"
+
+    # FEATURES="observability-prometheus channel-lark memory-postgres browser-native fantoccini metrics probe rag-pdf plugins-wasm"
 
 WORKDIR /app
 
