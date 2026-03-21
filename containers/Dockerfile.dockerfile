@@ -9,7 +9,6 @@ COPY source-src/web/ ./
 RUN npm run build
 
 # ── Stage 1: Build Backend ────────────
-# FROM rust:1.94-slim@sha256:da9dab7a6b8dd428e71718402e97207bb3e54167d37b5708616050b1e8f60ed6 AS builder
 FROM rust:slim-trixie AS builder
 ARG IMAGE_VERSION
 ARG REPO
@@ -19,9 +18,7 @@ ENV REPO=$REPO \
     ARCH=$ARCH \
     CPU_ARCH=$CPU_ARCH \
     IMAGE_VERSION=$IMAGE_VERSION \
-    FEATURES="observability-prometheus channel-lark memory-postgres browser-native fantoccini metrics probe rag-pdf"
-
-    # FEATURES="observability-prometheus channel-lark memory-postgres browser-native fantoccini metrics probe rag-pdf plugins-wasm"
+    FEATURES="observability-prometheus channel-lark memory-postgres browser-native fantoccini metrics probe rag-pdf plugins-wasm"
 
 WORKDIR /app
 
@@ -51,7 +48,6 @@ COPY source-src/web/ web/
 COPY source-src/*.rs .
 COPY --from=frontend-builder /frontend/dist/ web/dist/
 
-# RUN find . -name "*.rs" -exec touch {} +
 RUN touch src/main.rs
 
 RUN --mount=type=cache,id=zeroclaw-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
